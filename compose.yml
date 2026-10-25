@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: academy
+      POSTGRES_USER: academy
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?请在 .env 中设置教学数据库密码}
+    volumes:
+      - academy-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U academy -d academy"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  backend:
+    build: ./backend
+    environment:
+      SPRING_PROFILES_ACTIVE: demo,postgres
+      DB_URL: jdbc:postgresql://postgres:5432/academy
+      DB_USER: academy
+      DB_PASSWORD: ${DB_PASSWORD}
+      CORS_ORIGINS: http://localhost:8088,http://127.0.0.1:8088
+    depends_on:
+      postgres:
+        condition: service_healthy
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:8088:80"
+    depends_on:
+      - backend
+volumes:
+  academy-data:

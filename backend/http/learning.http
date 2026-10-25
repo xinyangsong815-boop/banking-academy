@@ -1,0 +1,46 @@
+@base = http://localhost:18080/api
+
+### 登录。IDEA / VS Code REST Client 可执行；复制响应 token 到下面变量。
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{"username":"admin","password":"Learn@123456"}
+
+### 将上一响应的 data.token 复制到此处，不要提交真实凭据。
+@token = paste-demo-token-here
+
+### 查看当前身份与权限
+GET {{base}}/auth/me
+Authorization: Bearer {{token}}
+
+### 客户查询
+GET {{base}}/customers?page=1&size=10&keyword=张
+Authorization: Bearer {{token}}
+
+### 查看账户
+GET {{base}}/accounts?page=1&size=10
+Authorization: Bearer {{token}}
+
+### 重复执行会复用同一业务号；改变金额前需改变幂等键。
+POST {{base}}/transfers
+Authorization: Bearer {{token}}
+Idempotency-Key: lesson-transfer-0001
+Content-Type: application/json
+
+{"sourceId":"A1001","targetId":"A1002","amount":"100.00","channel":"INSTANT","remark":"第一次转账课程"}
+
+### 查看转出流水
+GET {{base}}/accounts/A1001/entries?page=1&size=10
+Authorization: Bearer {{token}}
+
+### 查看通知
+GET {{base}}/notifications?page=1&size=10
+Authorization: Bearer {{token}}
+
+### 查看操作审计
+GET {{base}}/audits?page=1&size=10
+Authorization: Bearer {{token}}
+
+### 登出后原令牌立即失效
+POST {{base}}/auth/logout
+Authorization: Bearer {{token}}

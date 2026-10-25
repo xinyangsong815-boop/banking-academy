@@ -1,0 +1,15 @@
+package cn.academy.bank.config;
+
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.math.BigDecimal;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class JsonConfiguration {
+    @Bean
+    Jackson2ObjectMapperBuilderCustomizer decimalStrings() {
+        return builder -> builder.serializerByType(BigDecimal.class, ToStringSerializer.instance);
+    }
+}
